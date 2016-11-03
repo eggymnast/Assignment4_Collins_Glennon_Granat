@@ -1,9 +1,19 @@
 import pandas as pd
 import re
 
-data = pd.read_excel('06222016 Staph Array Data.xlsx') #read excel file
+data = pd.read_excel('06222016 Staph Array Data.xlsx') # read excel file
 
-PATTERN = r"(?P<PatientID>.*) (?P<visit>V?\d?)\s+(?P<dilution>\d+)" #pattern matching test
+
+def parse(s):           # parse column one of data file
+    list1 = ['','','']
+    vals = s[::-1].split(maxsplit = 2)
+    vals = [x[::-1] for x in vals]
+    if len(vals) == 2:
+        list1[0] = vals[0]
+        list1[2] = vals[1]
+        return list1
+    return vals
+
 
 
 
@@ -12,13 +22,10 @@ test2 = '62900 V2    100'
 test3 = '62900       100'
 test4 = '62129 V2 100'
 
+print(parse(test1), parse(test2), parse(test3), parse(test4))
 
 
-x1 = re.findall(PATTERN,test1)
-x2 = re.findall(PATTERN,test2)
-x3 = re.findall(PATTERN,test3)
-x4 = re.findall(PATTERN,test4)
-print(x1, x2, x3, x4)
+
 
 #print(d)
 
