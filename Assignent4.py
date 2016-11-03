@@ -14,6 +14,8 @@ def parse(s):           # parse column one of data file
         return list1
     return vals
 
+print ("Erin is the worst")
+
 
 
 
