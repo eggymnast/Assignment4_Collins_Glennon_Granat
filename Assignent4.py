@@ -1,5 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
+from collections import defaultdict
 
 data = pd.read_excel('06222016 Staph Array Data.xlsx') # read excel file
 bugs = list(data.ix[0, 4::])
@@ -21,6 +22,50 @@ l = []
 for item in data.ix[:,0]:
     l.append(parse(item))
 
+print(l)
+
+def visit_dict(himanshu):
+    dict_visit = {}
+
+    for sublist in himanshu:
+        if sublist[0] != "Standard":
+            if sublist[0] not in dict_visit:
+                dict_visit[sublist[0]] = {}
+
+    for key in dict_visit.keys():
+        empty = []
+        for sublist in himanshu:
+            if sublist[0] == key:
+                if sublist[1] not in empty:
+                    empty.append(sublist[1])
+        dict_visit[key] = empty
+
+    return dict_visit
+
+visits = visit_dict(l)
+
+
+def dilution_dict(jeff):
+    dict_dilution = {}
+
+    for sublist in jeff:
+        if sublist[0] != "Standard":
+            if sublist[0] not in dict_dilution:
+                dict_dilution[sublist[0]] = {}
+
+    for key in dict_dilution.keys():
+        empty = []
+        for sublist in jeff:
+            if sublist[0] == key:
+                if sublist[2] not in empty:
+                    empty.append(sublist[2])
+        dict_dilution[key] = empty
+
+    return dict_dilution
+
+dilutions = dilution_dict(l)
+print(dilutions)
+
 def make_pt_dicts(list):
     unique_pts = {}
 
@@ -32,15 +77,28 @@ def make_pt_dicts(list):
     for pt in unique_pts:
         unique_pts[pt] = bugsdict
 
-    for pt in unique_pts:
-        for bug in unique_pts[pt]:
-            pass
-
     return unique_pts
 
+def add_visits(mark):
 
-test = make_pt_dicts(l)
-print(test)
+    for pt in mark:
+        for bug in mark[pt]:
+            mark[pt][bug] = dict.fromkeys(visits[pt], {})
+
+    return mark
+
+def add_dilutions(amanda):
+    for pt in amanda:
+        for bug in amanda[pt]:
+            for visit in amanda[pt][bug]:
+                amanda[pt][bug][visit] = dict.fromkeys(dilutions[pt], {})
+
+
+    return amanda
+
+
+test1 = add_dilutions(add_visits(make_pt_dicts(l)))
+print(test1)
 
 
 
