@@ -2,11 +2,12 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 data = pd.read_excel('06222016 Staph Array Data.xlsx') # read excel file
+bugs = list(data.ix[0, 4::])
+bugsdict = dict.fromkeys(bugs, {})
 data = data[1:] # remove first line of data sheet
 
-print(data.index)
 
-def parse(s: object) -> object:           # parse column one of data file
+def parse(s):           # parse column one of data file
     list1 = ['','','']
     vals = s[::-1].split(maxsplit = 2)
     vals = [x[::-1] for x in vals]
@@ -20,14 +21,37 @@ l = []
 for item in data.ix[:,0]:
     l.append(parse(item))
 
+def make_pt_dicts(list):
+    unique_pts = {}
+
+    for sublist in list:
+        if sublist[0] != "Standard":
+            if sublist[0] not in unique_pts:
+                unique_pts[sublist[0]] = {}
+
+    for pt in unique_pts:
+        unique_pts[pt] = bugsdict
+
+    for pt in unique_pts:
+        for bug in unique_pts[pt]:
+            pass
+
+    return unique_pts
+
+
+test = make_pt_dicts(l)
+print(test)
+
+
+
 def graph_df(l, df):
     newdf.index = l[2]
     newdf.columns = l[1]
 
 
-fig1 = plt.figure()
-ax1 = fig1.add_subplot(221)
-fig1, axs = plt.subplots(ncols=1, figsize=(15,4))
+#fig1 = plt.figure()
+#ax1 = fig1.add_subplot(221)
+#fig1, axs = plt.subplots(ncols=1, figsize=(15,4))
 
 
 #ax1 = data.ix[:,0:5].plot(kind = 'line', ax = axs[0])
@@ -39,15 +63,6 @@ fig1, axs = plt.subplots(ncols=1, figsize=(15,4))
 #fig1.savefig('Figure 1.png')
 
 #PSMalpha2
-
-
-test1 = '01 VANDER Serum V2 100'
-test2 = '62900 V2    100'
-test3 = '62900       100'
-test4 = '62129 V2 100'
-
-print(parse(test1), parse(test2), parse(test3), parse(test4))
-
 
 
 
