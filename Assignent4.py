@@ -1,11 +1,14 @@
 import pandas as pd
+import numpy as np
 from matplotlib import pyplot as plt
 from collections import defaultdict
 
 data = pd.read_excel('06222016 Staph Array Data.xlsx') # read excel file
-bugs = list(data.ix[0, 4::])
-bugsdict = dict.fromkeys(bugs, {})
+columns = list(data.ix[0, :])
 data = data[1:] # remove first line of data sheet
+data.columns = columns
+bugs = columns[4:]
+bugsdict = dict.fromkeys(bugs, {})
 
 
 def parse(s):           # parse column one of data file
@@ -19,10 +22,10 @@ def parse(s):           # parse column one of data file
     return vals[::-1]
 
 l = []
-for item in data.ix[:,0]:
+for item in data.ix[:, 0]:
     l.append(parse(item))
 
-print(l)
+#print(l)
 
 def visit_dict(himanshu):
     dict_visit = {}
@@ -64,7 +67,7 @@ def dilution_dict(jeff):
     return dict_dilution
 
 dilutions = dilution_dict(l)
-print(dilutions)
+#print(dilutions)
 
 def make_pt_dicts(list):
     unique_pts = {}
@@ -93,11 +96,29 @@ def add_dilutions(amanda):
             for visit in amanda[pt][bug]:
                 amanda[pt][bug][visit] = dict.fromkeys(dilutions[pt], {})
 
-
     return amanda
 
+data = data.set_index(['Sample ID'])
+data = data.fillna(0)
 
-test1 = add_dilutions(add_visits(make_pt_dicts(l)))
+def tuple_time(sasha):      #changes the entry for every combination to a tuple that can be graphed
+    for pt in sasha:
+        for bug in sasha[pt]:
+            for visit in sasha[pt][bug]:
+                for dilution in sasha[pt][bug][visit]:
+                    x = str(pt) + " " + str(visit) + " " + str(dilution)
+                    if x in list(data.index):
+                        y = str(data.ix[x, bug])
+                        sasha[pt][bug][visit][dilution] = (dilution, y)     #add reg. expression to exclude non-numbers
+
+
+
+    return sasha
+
+
+test = add_dilutions(add_visits(make_pt_dicts(l)))
+#print(test)
+test1 = tuple_time(test)
 print(test1)
 
 
