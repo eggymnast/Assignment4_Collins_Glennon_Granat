@@ -26,7 +26,22 @@ for item in data.ix[:, 0]:
     l.append(parse(item))
 
 
-def visit_dict(himanshu):
+def make_pt_dicts(papa):
+    #makes a dictionary with each unique patient ID as a key and a dict of column titles as a key
+    unique_pts = {}
+
+    for sublist in papa:
+        if sublist[0] != "Standard":
+            if sublist[0] not in unique_pts:
+                unique_pts[sublist[0]] = {}
+
+    for pt in unique_pts:
+        unique_pts[pt] = bugs_dict
+
+    return unique_pts
+
+
+def visit_dict(himanshu):       #creates a dictionary with list of visits as value for each patient key
     dict_visit = {}
 
     for sublist in himanshu:
@@ -44,10 +59,20 @@ def visit_dict(himanshu):
 
     return dict_visit
 
+
 visits = visit_dict(l)
 
 
-def dilution_dict(jeff):
+def add_visits(mark):       #nests dictionary of visits within each column entry for each patient in patient dictionary
+
+    for pt in mark:
+        for bug in mark[pt]:
+            mark[pt][bug] = dict.fromkeys(visits[pt], {})
+
+    return mark
+
+
+def dilution_dict(jeff):        #makes dictionary of each dilution for each visit for each patient
     dict_dilution = {}
 
     for sublist in jeff:
@@ -66,32 +91,9 @@ def dilution_dict(jeff):
     return dict_dilution
 
 dilutions = dilution_dict(l)
-#print(dilutions)
 
 
-def make_pt_dicts(list):
-    unique_pts = {}
-
-    for sublist in list:
-        if sublist[0] != "Standard":
-            if sublist[0] not in unique_pts:
-                unique_pts[sublist[0]] = {}
-
-    for pt in unique_pts:
-        unique_pts[pt] = bugs_dict
-
-    return unique_pts
-
-
-def add_visits(mark):
-
-    for pt in mark:
-        for bug in mark[pt]:
-            mark[pt][bug] = dict.fromkeys(visits[pt], {})
-
-    return mark
-
-def add_dilutions(amanda):
+def add_dilutions(amanda):      #nests dict of dilutions within each visit for each column for each patient
     for pt in amanda:
         for bug in amanda[pt]:
             for visit in amanda[pt][bug]:
@@ -101,6 +103,7 @@ def add_dilutions(amanda):
 
 data = data.set_index(['Sample ID'])
 data = data.fillna(0)
+
 
 def tuple_time(sasha):      #changes the entry for every combination to a tuple that can be graphed
     for pt in sasha:
@@ -112,19 +115,15 @@ def tuple_time(sasha):      #changes the entry for every combination to a tuple 
                         y = str(data.ix[x, bug])
                         sasha[pt][bug][visit][dilution] = (dilution, y)     #add reg. expression to exclude non-numbers
 
-
-
     return sasha
 
 
 test = add_dilutions(add_visits(make_pt_dicts(l)))
-#print(test)
 test1 = tuple_time(test)
 print(test1)
 
 
-
-def graph_df(l, df):
+#def graph_df(l, df):
     newdf.index = l[2]
     newdf.columns = l[1]
 
