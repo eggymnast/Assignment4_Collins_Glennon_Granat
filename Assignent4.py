@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 files = pd.read_excel('06222016 Staph Array Data.xlsx',sheetname=[0,1,2,3,4,5,6,7,8,9,10])
 # read excel file into dictionary of dataframes, one for each plate
 
-columns = list(files[0].ix[0, :])
+columns = list(files[0].ix[0, :])       #generates the list of column names we're interested in
 data = files[0][1:]     # remove first line of data sheet
-data.columns = columns
-bugs = columns[4:]
-bugs_dict = dict.fromkeys(bugs, {})
+data.columns = columns      #sets the panda columns to the list we generated. Makes it easier to index dataframes
+bugs = columns[4:]      #pulls out list of "bugs" (lab tests) we're interested in
+bugs_dict = dict.fromkeys(bugs, {})     #makes a dictionary with keys=bugs and values = empty dicts
 
 
 def parse(s):           # parse column one of data file
@@ -21,9 +21,17 @@ def parse(s):           # parse column one of data file
         return list1[::-1]
     return vals[::-1]
 
-l = []
-for item in data.ix[:, 0]:
-    l.append(parse(item))
+list_dict = {}      #makes a dict with an entry for each plate, value = parsed first column for that plate
+for k, df in files.items():     #passes each key, value tuple from files dictionary of dataframes
+    columns = list(files[k].ix[0, :])
+    data = files[k][1:]
+    data.columns = columns
+
+    l = []
+    for item in df.ix[:, 0]:
+        l.append(parse(item))
+
+    list_dict.update({k: l})
 
 
 def make_pt_dicts(papa):
@@ -32,13 +40,21 @@ def make_pt_dicts(papa):
 
     for sublist in papa:
         if sublist[0] != "Standard":
-            if sublist[0] not in unique_pts:
-                unique_pts[sublist[0]] = {}
+            if sublist[0] != "Sample":
+                if sublist[0] not in unique_pts:
+                    unique_pts[sublist[0]] = {}
 
     for pt in unique_pts:
         unique_pts[pt] = bugs_dict
 
     return unique_pts
+
+big_dict = {}
+for k, l in list_dict.items():
+    # takes the parsed list for each plate and runs makes patient dictionary out of it,
+    # adds the dictionary to big_dict with plate number as key
+   data = make_pt_dicts(l)
+   big_dict.update({k: data})
 
 
 def visit_dict(himanshu):       #creates a dictionary with list of visits as value for each patient key
@@ -101,8 +117,8 @@ def add_dilutions(amanda):      #nests dict of dilutions within each visit for e
 
     return amanda
 
-data = data.set_index(['Sample ID'])
-data = data.fillna(0)
+#data = data.set_index(['Sample ID'])
+#data = data.fillna(0)
 
 
 def tuple_time(sasha):      #changes the entry for every combination to a tuple that can be graphed
@@ -118,14 +134,14 @@ def tuple_time(sasha):      #changes the entry for every combination to a tuple 
     return sasha
 
 
-test = add_dilutions(add_visits(make_pt_dicts(l)))
-test1 = tuple_time(test)
-print(test1)
+#test = add_dilutions(add_visits(make_pt_dicts(l)))
+#test1 = tuple_time(test)
+#print(test1)
 
 
 #def graph_df(l, df):
-    newdf.index = l[2]
-    newdf.columns = l[1]
+#    newdf.index = l[2]
+#    newdf.columns = l[1]
 
 
 #fig1 = plt.figure()
