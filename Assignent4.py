@@ -1,14 +1,14 @@
 import pandas as pd
-import numpy as np
 from matplotlib import pyplot as plt
-from collections import defaultdict
 
-data = pd.read_excel('06222016 Staph Array Data.xlsx') # read excel file
-columns = list(data.ix[0, :])
-data = data[1:] # remove first line of data sheet
+files = pd.read_excel('06222016 Staph Array Data.xlsx',sheetname=[0,1,2,3,4,5,6,7,8,9,10])
+# read excel file into dictionary of dataframes, one for each plate
+
+columns = list(files[0].ix[0, :])
+data = files[0][1:]     # remove first line of data sheet
 data.columns = columns
 bugs = columns[4:]
-bugsdict = dict.fromkeys(bugs, {})
+bugs_dict = dict.fromkeys(bugs, {})
 
 
 def parse(s):           # parse column one of data file
@@ -25,7 +25,6 @@ l = []
 for item in data.ix[:, 0]:
     l.append(parse(item))
 
-#print(l)
 
 def visit_dict(himanshu):
     dict_visit = {}
@@ -69,6 +68,7 @@ def dilution_dict(jeff):
 dilutions = dilution_dict(l)
 #print(dilutions)
 
+
 def make_pt_dicts(list):
     unique_pts = {}
 
@@ -78,9 +78,10 @@ def make_pt_dicts(list):
                 unique_pts[sublist[0]] = {}
 
     for pt in unique_pts:
-        unique_pts[pt] = bugsdict
+        unique_pts[pt] = bugs_dict
 
     return unique_pts
+
 
 def add_visits(mark):
 
