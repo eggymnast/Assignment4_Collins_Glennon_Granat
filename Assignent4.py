@@ -1,13 +1,18 @@
 import pandas as pd
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 files = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 # read excel file into dictionary of dataframes, one for each plate
+okay_files = {}
+for k, file in files.items():
+    file = file.fillna(0)
+    okay_files.update({k: file})
 
-columns = list(files[0].ix[0, :])       # generates the list of column names we're interested in
+columns = list(okay_files[0].ix[0, :])       # generates the list of column names we're interested in
 columns[30] = 'SEB_2'
-data = files[0][1:]     # remove first line of data sheet
+data = okay_files[0][1:]     # remove first line of data sheet
 data.columns = columns      # sets the panda columns to the list we generated. Makes it easier to index dataframes
 bugs = columns[4:]      # pulls out list of "bugs" (lab tests) we're interested in
 bugs_dict = dict.fromkeys(bugs, {})     # makes a dictionary with keys=bugs and values = empty dicts
@@ -19,13 +24,14 @@ def parse(s):           # parse column one of data file
     vals = [x[::-1] for x in vals]
     if len(vals) == 2:
         list1[0] = vals[0]
+        list1[1] = 'N/A'
         list1[2] = vals[1]
         return list1[::-1]
     return vals[::-1]
 
 good_files = {}     # using for reformatting data
 list_dict = {}      # makes a dict with an entry for each plate, value = parsed first column for that plate
-for k, df in files.items():     # passes each key, value tuple from files dictionary of dataframes
+for k, df in okay_files.items():     # passes each key, value tuple from files dictionary of dataframes
     columns = list(df.ix[0, :])
 
     def uniquify(pasta):      # function to add '_2' to the end of a redundent column name
@@ -157,7 +163,7 @@ big_dict = add_dilutions(big_dict)      # update big_dict w/ dilution entries fo
 gooder_files = {}       # using for re-reformatting data
 for k, df in good_files.items():     # passes each key, value tuple from files dictionary of dataframes
     data = df.set_index('Sample ID')        # sets the first column as index
-    data = data.fillna(0)     # replaces all "NaN" with 0, to make graphing easier
+    # data = data.fillna(0)     # replaces all "NaN" with 0, to make graphing easier
     gooder_files.update({k: data})
 
 
@@ -207,3 +213,41 @@ def access_plates(sasha):       # iterates through dictionary and generates colu
                 fig.savefig(pt+bug, format='png')
 
 access_plates(big_dict)
+
+for k, v in list_dict.items():         # fixes cases where parsing function fails
+    for sub_v in v:
+        if len(sub_v) != 3:
+            sub_v.append('N/A')
+            sub_v.append('UNKOWN')
+
+new_dict = {}       # Makes dict easier to modify before final export
+for k, file in files.items():
+    columns = list(file.ix[0, :])
+    data = file
+    data.columns = columns
+    new_dict.update({k: data})
+
+
+final_wow = {}
+for k, data in new_dict.items():
+    column_1 = []
+    for l in list_dict[k]:
+        column_1.append(l[0])
+    column_2 = []
+    for l in list_dict[k]:
+        column_2.append(l[1])
+    column_3 = []
+    for l in list_dict[k]:
+        column_3.append(l[2])
+    first_three = pd.DataFrame({'Patient ID': column_1, 'Visit': column_2, 'Dilutions': column_3})
+    cols = ['Patient ID', 'Visit', 'Dilutions']
+    first_three = first_three[cols]     # rearranges columns in new dataframe to be in correct order
+    last_cols = data.ix[:, 1:]
+    merged = pd.concat([first_three, last_cols], axis=1, ignore_index=False)
+    # makes merged dataframe for each plate
+    print(merged)
+    final_wow.update({k: merged})
+
+
+for k, data in final_wow.items():       #saves tab-delimited files of each plate
+    data.to_csv('Plate-'+str(k)+'.txt', sep='\t')
