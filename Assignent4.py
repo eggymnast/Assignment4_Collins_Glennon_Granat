@@ -6,6 +6,7 @@ files = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname=[0, 1, 2, 3, 4
 # read excel file into dictionary of dataframes, one for each plate
 
 columns = list(files[0].ix[0, :])       # generates the list of column names we're interested in
+columns[30] = 'SEB_2'
 data = files[0][1:]     # remove first line of data sheet
 data.columns = columns      # sets the panda columns to the list we generated. Makes it easier to index dataframes
 bugs = columns[4:]      # pulls out list of "bugs" (lab tests) we're interested in
@@ -26,8 +27,24 @@ good_files = {}     # using for reformatting data
 list_dict = {}      # makes a dict with an entry for each plate, value = parsed first column for that plate
 for k, df in files.items():     # passes each key, value tuple from files dictionary of dataframes
     columns = list(df.ix[0, :])
+
+    def uniquify(pasta):      # function to add '_2' to the end of a redundent column name
+        seen = set()
+
+        for bug in pasta:
+            fudge = 1
+            newbug = bug
+
+            while newbug in seen:
+                fudge += 1
+                newbug = "{}_{}".format(bug, fudge)
+
+            yield newbug
+            seen.add(newbug)
+    new_columns = list(uniquify(columns))
+
     data = df[1:]
-    data.columns = columns
+    data.columns = new_columns
     good_files.update({k: data})
 
     l = []
@@ -148,12 +165,12 @@ def tuple_time(sasha):      # changes the entry for every combination to a tuple
     for plate in sasha:
         for pt in sasha[plate]:
             for bug in sasha[plate][pt]:
-                for visit in sasha[plate][pt][bug]:
-                    for dilution in sasha[plate][pt][bug][visit]:
-                        x = str(pt) + " " + str(visit) + " " + str(dilution)        # constructs index string
-                        if x in list(gooder_files[plate].index):        # compares to indeces in reforated dataframe
-                            y = str(gooder_files[plate].ix[x, bug])
-                            sasha[plate][pt][bug][visit][dilution] = (dilution, y)
+                    for visit in sasha[plate][pt][bug]:
+                        for dilution in sasha[plate][pt][bug][visit]:
+                            x = str(pt) + " " + str(visit) + " " + str(dilution)        # constructs index string
+                            if x in list(gooder_files[plate].index):        # compares to indeces in reforated dataframe
+                                y = (gooder_files[plate].ix[x, bug])
+                                sasha[plate][pt][bug][visit][dilution] = y
 
     return sasha
 
