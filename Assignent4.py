@@ -174,8 +174,32 @@ def tuple_time(sasha):      # changes the entry for every combination to a tuple
 
     return sasha
 
-test = tuple_time(big_dict)
-print(test)
+big_dict = tuple_time(big_dict)
+
+
+def plot_tests(visit):  #generates a single plot for a bug/visit
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(221)
+    fig1, axs = plt.subplots(ncols=1, figsize=(15, 4))
+    plt.xscale('log')
+    for data_dict in visit.values():
+        x = list(data_dict.keys())
+        y = list(data_dict.values())
+        ax1 = plt.plot(x,y)
+    return fig1
+
+
+
+
+def access_plates(sasha):   #calls the plot function and allows us to plot all of the data
+    for plate in sasha:
+        for pt in sasha[plate]:
+            for bug in sasha[plate][pt]:
+                        fig = plot_tests(sasha[plate][pt][bug])
+                        fig.savefig(pt+bug, format = 'png')
+
+
+access_plates(big_dict)
 
 
 # def graph_df(l, df):
