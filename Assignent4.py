@@ -174,10 +174,10 @@ def tuple_time(sasha):      # changes the entry for every combination to a tuple
 
     return sasha
 
-big_dict = tuple_time(big_dict)
+big_dict = tuple_time(big_dict)     # final dictionary containing all data to be graphed
 
 
-def plot_tests(visit, legend_list, pt, bug):
+def plot_tests(visit, legend_list, pt, bug):        # does the plotting for each graph
     pt = pt
     bug = bug
     title = pt + " - " + bug
@@ -198,7 +198,7 @@ def plot_tests(visit, legend_list, pt, bug):
     return fig1
 
 
-def access_plates(sasha):
+def access_plates(sasha):       # iterates through dictionary and generates column title, patient, and #visits to plot
     for plate in sasha:
         for pt in sasha[plate]:
             for bug in sasha[plate][pt]:
