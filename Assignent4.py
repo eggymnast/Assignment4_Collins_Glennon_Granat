@@ -177,47 +177,33 @@ def tuple_time(sasha):      # changes the entry for every combination to a tuple
 big_dict = tuple_time(big_dict)
 
 
-def plot_tests(visit):  #generates a single plot for a bug/visit
+def plot_tests(visit, legend_list, pt, bug):
+    pt = pt
+    bug = bug
+    title = pt + " - " + bug
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(221)
     fig1, axs = plt.subplots(ncols=1, figsize=(15, 4))
     plt.xscale('log')
+
     for data_dict in visit.values():
         x = list(data_dict.keys())
         y = list(data_dict.values())
-        ax1 = plt.plot(x,y)
+        ax1 = plt.plot(x, y, x, y, 'o')
+        plt.title(title)
+        plt.xlabel('Dilution')
+        plt.ylabel('Intensity')
+        plt.legend(legend_list, loc='best', frameon=bool)
+
     return fig1
 
 
-
-
-def access_plates(sasha):   #calls the plot function and allows us to plot all of the data
+def access_plates(sasha):
     for plate in sasha:
         for pt in sasha[plate]:
             for bug in sasha[plate][pt]:
-                        fig = plot_tests(sasha[plate][pt][bug])
-                        fig.savefig(pt+bug, format = 'png')
-
+                legend_list = sasha[plate][pt][bug].keys()
+                fig = plot_tests((sasha[plate][pt][bug]), legend_list, pt, bug)
+                fig.savefig(pt+bug, format='png')
 
 access_plates(big_dict)
-
-
-# def graph_df(l, df):
-    # newdf.index = l[2]
-    # newdf.columns = l[1]
-
-
-# fig1 = plt.figure()
-# ax1 = fig1.add_subplot(221)
-# fig1, axs = plt.subplots(ncols=1, figsize=(15,4))
-
-
-# ax1 = data.ix[:,0:5].plot(kind = 'line', ax = axs[0])
-# ax1.set_title('HMECprolif_1250')
-# ax1.set_xlabel('time')
-# ax1.set_ylabel('absorbance')
-# ax1.legend(title = 'Legend', loc = 0)
-
-# fig1.savefig('Figure 1.png')
-
-# PSMalpha2
