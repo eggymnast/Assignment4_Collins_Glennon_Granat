@@ -18,12 +18,21 @@ def plot_tests(visit, legend_list, pt, bug):
     for data_dict in visit.values():
         x = list(data_dict.keys())
         y = list(data_dict.values())
+<<<<<<< Updated upstream
         ax1 = plt.plot(x, y, x, y, 'bo')
         plt.title(title)
         plt.xlabel('Dilution')
         plt.ylabel('Intensity')
         plt.legend(legend_list, loc='best', frameon=bool)
+=======
+        ax1 = plt.plot(x,y)
+        plt.title('some numbers')
+        print(type(x))
+>>>>>>> Stashed changes
     return fig1
+
+z = plot_tests(easy_test)
+z.savefig("figure1.png")
 
 
 
@@ -35,7 +44,7 @@ def access_plates(sasha):
                 fig = plot_tests((sasha[plate][pt][bug]), legend_list, pt, bug)
                 fig.savefig(pt+bug, format='png')
 
-access_plates(sample)
+#access_plates(sample)
 
 
 # ax1 = data.ix[:,0:5].plot(kind = 'line', ax = axs[0])
